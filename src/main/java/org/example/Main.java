@@ -15,7 +15,7 @@ public class Main {
         Tomcat.addServlet(ctx, "shapoval", new MyNameServlet());
         ctx.addServletMappingDecoded("/shapoval", "shapoval");
         Tomcat.addServlet(ctx, "system", new SystemInfoServlet());
-        ctx.addServletMappingDecoded("/system", "system");
+        ctx.addServletMappingDecoded("/os-info", "system");
 
         tomcat.start();
         tomcat.getServer().await();
