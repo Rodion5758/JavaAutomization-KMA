@@ -38,6 +38,32 @@
                     <mainClass>org.example.Main</mainClass>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.example</groupId>
+                <artifactId>source-collector-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>collect</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.example</groupId>
+                <artifactId>endpoint-lister-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>list-endpoints</goal>
+                        </goals>
+                        <phase>package</phase>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
