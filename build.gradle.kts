@@ -15,6 +15,8 @@ repositories {
 
 dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.25")
+    implementation(project(":annotations"))
+    annotationProcessor(project(":processor"))
 }
 
 tasks.register("countServlets") {
