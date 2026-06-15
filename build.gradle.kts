@@ -17,6 +17,36 @@ dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.25")
     implementation(project(":annotations"))
     annotationProcessor(project(":processor"))
+
+    testImplementation(platform("org.junit:junit-bom:6.1.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.junit.platform:junit-platform-suite")
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.test {
+    useJUnitPlatform()
+    testLogging { events("passed", "skipped", "failed") }
+}
+
+tasks.register<Test>("testFast") {
+    group = "verification"
+    description = "Runs only tests tagged 'fast' (FastSuite)"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    filter { excludeTestsMatching("*.suite.*") }
+    useJUnitPlatform { includeTags("fast") }
+    testLogging { events("passed", "skipped", "failed") }
+}
+
+tasks.register<Test>("testSlow") {
+    group = "verification"
+    description = "Runs only tests tagged 'slow' (SlowSuite)"
+    testClassesDirs = sourceSets["test"].output.classesDirs
+    classpath = sourceSets["test"].runtimeClasspath
+    filter { excludeTestsMatching("*.suite.*") }
+    useJUnitPlatform { includeTags("slow") }
+    testLogging { events("passed", "skipped", "failed") }
 }
 
 tasks.register("countServlets") {
