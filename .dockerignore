@@ -1,0 +1,6 @@
+.git
+build/
+.gradle/
+.idea/
+tomcat.9090/
+*.iml

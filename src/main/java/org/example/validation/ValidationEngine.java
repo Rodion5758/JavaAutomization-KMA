@@ -23,14 +23,16 @@ public class ValidationEngine {
                 }
                 if (field.isAnnotationPresent(MinLength.class) && value instanceof String s) {
                     int min = field.getAnnotation(MinLength.class).value();
-                    if (s.length() < min)
+                    if (s.length() < min) {
                         errors.add(field.getName() + ": must be at least " + min + " characters");
+                    }
                 }
                 if (field.isAnnotationPresent(Range.class) && value instanceof Number n) {
                     Range range = field.getAnnotation(Range.class);
                     long v = n.longValue();
-                    if (v < range.min() || v > range.max())
+                    if (v < range.min() || v > range.max()) {
                         errors.add(field.getName() + ": must be between " + range.min() + " and " + range.max());
+                    }
                 }
             } catch (IllegalAccessException e) {
                 continue;

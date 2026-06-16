@@ -1,7 +1,11 @@
 package org.example.validation;
 
 import org.example.annotations.NotNull;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DynamicTest;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -10,7 +14,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
@@ -71,8 +76,11 @@ public class ValidationEngineTest {
             UserRegistrationForm form = new UserRegistrationForm("alice", "alice@example.com", c.age());
             List<String> errors = ValidationEngine.validate(form);
             long ageErrors = errors.stream().filter(e -> e.startsWith("age")).count();
-            if (c.valid()) assertEquals(0, ageErrors);
-            else           assertEquals(1, ageErrors);
+            if (c.valid()) {
+                assertEquals(0, ageErrors);
+            } else {
+                assertEquals(1, ageErrors);
+            }
         }));
     }
 }

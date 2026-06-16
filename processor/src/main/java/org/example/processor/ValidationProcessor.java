@@ -7,7 +7,11 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.*;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
 import javax.lang.model.util.ElementFilter;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -25,7 +29,9 @@ public class ValidationProcessor extends AbstractProcessor {
     @Override
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
         for (Element element : roundEnv.getElementsAnnotatedWith(AutoValidated.class)) {
-            if (element.getKind() != ElementKind.CLASS) continue;
+            if (element.getKind() != ElementKind.CLASS) {
+                continue;
+            }
             TypeElement cls = (TypeElement) element;
             String pkg = processingEnv.getElementUtils().getPackageOf(cls).getQualifiedName().toString();
             String name = cls.getSimpleName().toString();
@@ -88,8 +94,9 @@ public class ValidationProcessor extends AbstractProcessor {
 
     private int intValue(AnnotationMirror mirror, String key) {
         for (var e : processingEnv.getElementUtils().getElementValuesWithDefaults(mirror).entrySet()) {
-            if (e.getKey().getSimpleName().contentEquals(key))
+            if (e.getKey().getSimpleName().contentEquals(key)) {
                 return (Integer) e.getValue().getValue();
+            }
         }
         return 0;
     }

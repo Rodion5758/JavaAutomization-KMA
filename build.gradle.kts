@@ -1,8 +1,27 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     java
+    id("com.gradleup.shadow") version "9.0.0"
 }
 
 apply<ServletToolsPlugin>()
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+
+    plugins.withType<JavaPlugin> {
+        apply(plugin = "checkstyle")
+        extensions.configure<org.gradle.api.plugins.quality.CheckstyleExtension> {
+            toolVersion = "10.23.0"
+            configFile = rootProject.file("config/checkstyle/checkstyle.xml")
+            maxWarnings = 0
+            isIgnoreFailures = false
+        }
+    }
+}
 
 java {
     sourceCompatibility = JavaVersion.VERSION_21
@@ -22,6 +41,14 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.platform:junit-platform-suite")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    mergeServiceFiles()
+    archiveClassifier.set("all")
+    manifest {
+        attributes["Main-Class"] = "org.example.Main"
+    }
 }
 
 tasks.test {
