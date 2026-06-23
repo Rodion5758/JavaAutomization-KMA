@@ -32,6 +32,8 @@ repositories {
     mavenCentral()
 }
 
+val pitestClasspath by configurations.creating
+
 dependencies {
     implementation("org.apache.tomcat.embed:tomcat-embed-core:10.1.25")
     implementation(project(":annotations"))
@@ -41,6 +43,13 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.junit.platform:junit-platform-suite")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    testImplementation("org.mockito:mockito-core:5.14.2")
+    testImplementation("org.mockito:mockito-junit-jupiter:5.14.2")
+    testImplementation("org.assertj:assertj-core:3.27.3")
+
+    pitestClasspath("org.pitest:pitest-command-line:1.25.5")
+    pitestClasspath("org.pitest:pitest-junit5-plugin:1.2.3")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
@@ -74,6 +83,48 @@ tasks.register<Test>("testSlow") {
     filter { excludeTestsMatching("*.suite.*") }
     useJUnitPlatform { includeTags("slow") }
     testLogging { events("passed", "skipped", "failed") }
+}
+
+tasks.register<JavaExec>("pitestWeak") {
+    group = "verification"
+    description = "PIT with weak test — mutations SURVIVE (bad coverage)"
+    dependsOn(tasks.named("testClasses"))
+    mainClass.set("org.pitest.mutationtest.commandline.MutationCoverageReport")
+    classpath = pitestClasspath + sourceSets["test"].runtimeClasspath
+    doFirst {
+        val reportsDir = layout.buildDirectory.dir("reports/pitest-weak").get().asFile
+        reportsDir.mkdirs()
+        args(
+            "--targetClasses", "org.example.order.OrderService",
+            "--targetTests", "org.example.order.OrderServiceMutationWeakTest",
+            "--sourceDirs", "src/main/java",
+            "--reportDir", reportsDir.absolutePath,
+            "--outputFormats", "HTML",
+            "--mutators", "CONDITIONALS_BOUNDARY,NEGATE_CONDITIONALS",
+            "--failWhenNoMutations", "false"
+        )
+    }
+}
+
+tasks.register<JavaExec>("pitestStrong") {
+    group = "verification"
+    description = "PIT with strong test — mutations KILLED (good coverage)"
+    dependsOn(tasks.named("testClasses"))
+    mainClass.set("org.pitest.mutationtest.commandline.MutationCoverageReport")
+    classpath = pitestClasspath + sourceSets["test"].runtimeClasspath
+    doFirst {
+        val reportsDir = layout.buildDirectory.dir("reports/pitest-strong").get().asFile
+        reportsDir.mkdirs()
+        args(
+            "--targetClasses", "org.example.order.OrderService",
+            "--targetTests", "org.example.order.OrderServiceMutationStrongTest",
+            "--sourceDirs", "src/main/java",
+            "--reportDir", reportsDir.absolutePath,
+            "--outputFormats", "HTML",
+            "--mutators", "CONDITIONALS_BOUNDARY,NEGATE_CONDITIONALS",
+            "--failWhenNoMutations", "false"
+        )
+    }
 }
 
 tasks.register("countServlets") {
